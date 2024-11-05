@@ -1,0 +1,12 @@
+- Fix CustomParticleIconModel not working with Wrapped Models
+- Allow null values for PlaySoundCallback
+- Only change the blend mode for render_type
+- Add CustomBoatModel
+- Fix PlayerAttributesExtensions not being implemented
+- Add AddPackFindersEvent deprecate AddPackFindersCallback
+- add GuiGraphicsExtension and deprecate methods in ClientHooks in favor of ones in gui_util
+- Add FluidInteractionRegistry
+- Add MobEffectEvent and deprecate PotionEvents
+- Add BaseFlowingFluid
+- Partial implementation for BlockToolModificationEvent
+- Fix PlayerTickEvents running twice per tick on the server (#117)
