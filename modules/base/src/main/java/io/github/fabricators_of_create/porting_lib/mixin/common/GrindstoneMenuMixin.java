@@ -76,7 +76,7 @@ public abstract class GrindstoneMenuMixin extends AbstractContainerMenu implemen
 
 	@Mixin(targets = "net/minecraft/world/inventory/GrindstoneMenu$4")
 	public abstract static class GrindstoneMenuOutputSlotMixin {
-		@Shadow(aliases = "field_16780")
+		@Shadow(aliases = { "this$0", "field_16780" })
 		@Final
 		GrindstoneMenu menu;
 
