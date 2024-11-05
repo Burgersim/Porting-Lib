@@ -141,7 +141,8 @@
     "client.RenderTargetMixin",
     "client.SkullBlockRendererMixin",
     "client.TextureAtlasMixin",
-    "client.frex.EntityBlockRenderContextMixin"
+    "client.frex.EntityBlockRenderContextMixin",
+    "common.AbstractButtonAccessor"
   ],
   "injectors": {
     "defaultRequire": 1,
