@@ -42,6 +42,13 @@ public class PortingHooks {
 		return player.hasCorrectToolForDrops(state);
 	}
 
+	public static int onBlockBreakEvent(Level world, GameType gameType, ServerPlayer entityPlayer, BlockPos pos) {
+		BlockState state = world.getBlockState(pos);
+		Item item = entityPlayer.getMainHandItem().getItem();
+		boolean canAttackBlock = item.canAttackBlock(state, world, pos, entityPlayer);
+		return onBlockBreakEvent(world, gameType, entityPlayer, pos, canAttackBlock);
+	}
+
 	public static int onBlockBreakEvent(Level world, GameType gameType, ServerPlayer entityPlayer, BlockPos pos, boolean canAttackBlock) {
 		// Logic from tryHarvestBlock for pre-canceling the event
 		boolean preCancelEvent = false;
