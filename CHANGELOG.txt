@@ -10,3 +10,4 @@
 - Add BaseFlowingFluid
 - Partial implementation for BlockToolModificationEvent
 - Fix PlayerTickEvents running twice per tick on the server (#117)
+- Don't call canAttackBlock twice on block break (fixes debug stick)
