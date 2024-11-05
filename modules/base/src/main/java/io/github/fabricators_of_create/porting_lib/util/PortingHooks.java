@@ -22,13 +22,10 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -37,7 +34,6 @@ import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 
 import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings({"removal", "UnstableApiUsage"})
 public class PortingHooks {
 	public static boolean isCorrectToolForDrops(@NotNull BlockState state, @NotNull Player player) {
 		if (!state.requiresCorrectToolForDrops())
@@ -46,11 +42,11 @@ public class PortingHooks {
 		return player.hasCorrectToolForDrops(state);
 	}
 
-	public static int onBlockBreakEvent(Level world, GameType gameType, ServerPlayer entityPlayer, BlockPos pos) {
+	public static int onBlockBreakEvent(Level world, GameType gameType, ServerPlayer entityPlayer, BlockPos pos, boolean canAttackBlock) {
 		// Logic from tryHarvestBlock for pre-canceling the event
 		boolean preCancelEvent = false;
 		ItemStack itemstack = entityPlayer.getMainHandItem();
-		if (!itemstack.isEmpty() && !itemstack.getItem().canAttackBlock(world.getBlockState(pos), world, pos, entityPlayer)) {
+		if (!itemstack.isEmpty() && !canAttackBlock) {
 			preCancelEvent = true;
 		}
 

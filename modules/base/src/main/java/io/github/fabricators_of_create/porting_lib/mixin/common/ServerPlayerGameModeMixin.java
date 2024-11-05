@@ -94,7 +94,7 @@ public abstract class ServerPlayerGameModeMixin {
 
 	@ModifyExpressionValue(method = "destroyBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/Item;canAttackBlock(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;)Z"))
 	private boolean port_lib$blockBreakHook(boolean original, BlockPos pos, @Share("xp") LocalIntRef xp) {
-		int exp = PortingHooks.onBlockBreakEvent(this.level, this.gameModeForPlayer, this.player, pos);
+		int exp = PortingHooks.onBlockBreakEvent(this.level, this.gameModeForPlayer, this.player, pos, original);
 		xp.set(exp);
 		return !(exp == -1);
 	}
