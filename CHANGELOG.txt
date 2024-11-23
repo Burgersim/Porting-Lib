@@ -13,3 +13,4 @@
 - Don't call canAttackBlock twice on block break (fixes debug stick)
 - Fix GrindstoneMenuMixin causing issues with specific mappings (#138)
 - Fix TAW causing issues with specific mappings (#96)
+- Fix CustomDestroyEffectsBlock's inverted behavior
