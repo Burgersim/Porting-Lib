@@ -2,6 +2,9 @@ package io.github.fabricators_of_create.porting_lib.entity.mixin.client;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+
 import io.github.fabricators_of_create.porting_lib.core.event.BaseEvent;
 import io.github.fabricators_of_create.porting_lib.entity.events.EntityInteractCallback;
 import io.github.fabricators_of_create.porting_lib.entity.events.PlayerInteractionEvents;
@@ -22,6 +25,7 @@ import net.minecraft.world.level.GameType;
 
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -46,6 +50,21 @@ public class MultiPlayerGameModeMixin {
 			InteractionResult cancelResult = EntityInteractCallback.EVENT.invoker().onEntityInteract(player, hand, target);
 			if (cancelResult != null) cir.setReturnValue(cancelResult);
 		}
+	}
+
+	@WrapOperation(
+			method = "interactAt",
+			at = @At(
+					value = "INVOKE",
+					target = "Lnet/minecraft/world/entity/Entity;interactAt(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"
+			)
+	)
+	private InteractionResult onEntityInteractPositioned(Entity entity, Player player, Vec3 pos, InteractionHand hand, Operation<InteractionResult> original) {
+		InteractionResult result = PlayerInteractionEvents.INTERACT_ENTITY_POSITIONED.invoker().onInteract(player, entity, pos, hand);
+		if (result != null)
+			return result;
+
+		return original.call(entity, player, pos, hand);
 	}
 
 	@WrapWithCondition(method = "method_41936", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;destroyBlock(Lnet/minecraft/core/BlockPos;)Z"))

@@ -15,6 +15,7 @@ import io.github.fabricators_of_create.porting_lib.entity.events.LivingAttackEve
 import io.github.fabricators_of_create.porting_lib.entity.events.LivingDeathEvent;
 import io.github.fabricators_of_create.porting_lib.entity.events.LivingEntityEvents;
 import io.github.fabricators_of_create.porting_lib.entity.events.PlayerEvents;
+import io.github.fabricators_of_create.porting_lib.entity.events.PlayerInteractionEvents;
 import io.github.fabricators_of_create.porting_lib.entity.events.PlayerTickEvents;
 import io.github.fabricators_of_create.porting_lib.entity.events.living.LivingDamageEvent;
 import io.github.fabricators_of_create.porting_lib.entity.events.living.LivingHurtEvent;
@@ -59,10 +60,25 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
 		PlayerTickEvents.END.invoker().onEndOfPlayerTick((Player) (Object) this);
 	}
 
-	@Inject(method = "interactOn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;interact(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"), cancellable = true)
-	public void port_lib$onEntityInteract(Entity entityToInteractOn, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
-		InteractionResult cancelResult = EntityInteractCallback.EVENT.invoker().onEntityInteract((Player) (Object) this, hand, entityToInteractOn);
-		if (cancelResult != null) cir.setReturnValue(cancelResult);
+	@Inject(
+			method = "interactOn",
+			at = @At(
+					value = "INVOKE",
+					target = "Lnet/minecraft/world/entity/player/Player;getItemInHand(Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/item/ItemStack;",
+					ordinal = 0
+			),
+			cancellable = true
+	)
+	public void onEntityInteract(Entity entity, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+		InteractionResult result = PlayerInteractionEvents.INTERACT_ENTITY_GENERAL.invoker().onInteract((Player) (Object) this, entity, hand);
+
+		if (result == null) {
+			result = EntityInteractCallback.EVENT.invoker().onEntityInteract((Player) (Object) this, hand, entity);
+		}
+
+		if (result != null) {
+			cir.setReturnValue(result);
+		}
 	}
 
 	@Inject(method = "hurt", at = @At("HEAD"), cancellable = true)

@@ -7,14 +7,17 @@ import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,7 +43,6 @@ public abstract class PlayerInteractionEvents extends PlayerEvents {
 		for(PlayerLeftClickBlock e : callbacks)
 			e.onLeftClickBlock(event);
 	}));
-
 	/**
 	 * This event is fired on the client side when the player left clicks empty space with any ItemStack.
 	 * The server is not aware of when the client left clicks empty space, you will need to tell the server yourself.
@@ -50,6 +52,38 @@ public abstract class PlayerInteractionEvents extends PlayerEvents {
 		for(PlayerLeftClickEmpty e : callbacks)
 			e.onLeftClickEmpty(event);
 	}));
+	/**
+	 * This event is fired when a player interacts with an entity from {@link Player#interactOn(Entity, InteractionHand)}.
+	 * It is fired on both the client and server for non-spectator players.
+	 * <p>
+	 * Returning a non-null result will cancel the vanilla entity interaction logic.
+	 * On the client side, a packet is still sent to the server notifying it of the interaction.
+	 */
+	public static final Event<InteractEntityGeneral> INTERACT_ENTITY_GENERAL = EventFactory.createArrayBacked(InteractEntityGeneral.class, callbacks -> (player, entity, hand) -> {
+		for (InteractEntityGeneral callback : callbacks) {
+			InteractionResult result = callback.onInteract(player, entity, hand);
+			if (result != null) {
+				return result;
+			}
+		}
+		return null;
+	});
+	/**
+	 * This event is fired before a player interacts with an entity through {@link Entity#interactAt(Player, Vec3, InteractionHand)}.
+	 * It is fired for non-spectator players on the client, and on the server when handling {@link ServerboundInteractPacket}s.
+	 * <p>
+	 * Returning a non-null result will cancel the vanilla entity interaction logic.
+	 * On the client side, a packet is still sent to the server notifying it of the interaction.
+	 */
+	public static final Event<InteractEntityPositioned> INTERACT_ENTITY_POSITIONED = EventFactory.createArrayBacked(InteractEntityPositioned.class, callbacks -> (player, entity, pos, hand) -> {
+		for (InteractEntityPositioned callback : callbacks) {
+			InteractionResult result = callback.onInteract(player, entity, pos, hand);
+			if (result != null) {
+				return result;
+			}
+		}
+		return null;
+	});
 
 	private final InteractionHand hand;
 	private final BlockPos pos;
@@ -189,5 +223,15 @@ public abstract class PlayerInteractionEvents extends PlayerEvents {
 	@FunctionalInterface
 	public interface PlayerLeftClickEmpty {
 		void onLeftClickEmpty(LeftClickEmpty event);
+	}
+
+	public interface InteractEntityGeneral {
+		@Nullable
+		InteractionResult onInteract(Player player, Entity entity, InteractionHand hand);
+	}
+
+	public interface InteractEntityPositioned {
+		@Nullable
+		InteractionResult onInteract(Player player, Entity entity, Vec3 pos, InteractionHand hand);
 	}
 }

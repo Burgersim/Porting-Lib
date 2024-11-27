@@ -38,6 +38,7 @@
     "common.ProjectileMixin",
     "common.ProjectileUtilMixin",
     "common.ServerEntityMixin",
+    "common.ServerGamePacketListenerImplInteractHandlerMixin",
     "common.ServerLevelMixin",
     "common.ServerPlayerGameModeMixin",
     "common.ServerPlayerMixin",

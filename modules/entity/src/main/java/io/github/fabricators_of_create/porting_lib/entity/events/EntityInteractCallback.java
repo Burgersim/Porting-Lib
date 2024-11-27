@@ -9,6 +9,10 @@ import net.minecraft.world.entity.player.Player;
 
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * @deprecated switch to {@link PlayerInteractionEvents#INTERACT_ENTITY_GENERAL} or {@link PlayerInteractionEvents#INTERACT_ENTITY_POSITIONED}
+ */
+@Deprecated(forRemoval = true)
 public interface EntityInteractCallback {
 	/**
 	 * Fired when an entity is interacted with by a player, from {@link Player#interactOn(Entity, InteractionHand)}
