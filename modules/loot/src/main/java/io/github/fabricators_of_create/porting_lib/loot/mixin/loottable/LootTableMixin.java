@@ -24,7 +24,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.loot.LootTable;
 
-@Mixin(value = LootTable.class, priority = 50_000)
+@Mixin(value = LootTable.class, priority = 50_000) // high priority to make sure the WrapMethod below catches most injections
 public class LootTableMixin implements LootTableExtensions {
 	@Unique
 	private ResourceLocation lootTableId;
