@@ -15,3 +15,4 @@
 - Fix TAW causing issues with specific mappings (#96)
 - Fix CustomDestroyEffectsBlock's inverted behavior
 - Deprecated EntityInteractCallback in favor of two new events in PlayerInteractionEvents (#135)
+- Improved compatibility of CriticalHitEvent's hooks

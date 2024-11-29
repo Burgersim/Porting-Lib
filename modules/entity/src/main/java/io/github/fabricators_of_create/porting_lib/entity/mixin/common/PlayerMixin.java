@@ -1,14 +1,20 @@
 package io.github.fabricators_of_create.porting_lib.entity.mixin.common;
 
+import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Slice;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Share;
-
-import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
-
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 
-import io.github.fabricators_of_create.porting_lib.core.event.BaseEvent;
 import io.github.fabricators_of_create.porting_lib.entity.events.CriticalHitEvent;
 import io.github.fabricators_of_create.porting_lib.entity.events.EntityInteractCallback;
 import io.github.fabricators_of_create.porting_lib.entity.events.LivingAttackEvent;
@@ -29,20 +35,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-
 import net.minecraft.world.level.Level;
-
 import net.minecraft.world.level.block.state.BlockState;
-
-import org.jetbrains.annotations.Nullable;
-import org.objectweb.asm.Opcodes;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Slice;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = Player.class, priority = 500)
 public abstract class PlayerMixin extends LivingEntity implements PlayerExtension {
@@ -107,28 +101,32 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerExtensio
 				from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isSprinting()Z", ordinal = 1),
 				to = @At(value = "CONSTANT", args = "floatValue=1.5F")
 			),
+			// this is disgusting but there's no other way to target this.
+			// This sneaks right before the if statement that applies the extra crit damage (f *= 1.5F).
 			at = @At(value = "STORE", opcode = Opcodes.ISTORE), index = 8
 	)
-	private boolean modifyResult(boolean value, @Share("original") LocalBooleanRef vanilla) {
-		vanilla.set(value);
-		return true;
-	}
+	private boolean fireCritEvent(boolean original, Entity target, @Share("mult") LocalRef<Float> mult) {
+		float damageMultiplier = original ? 1.5f : 1;
+		CriticalHitEvent event = new CriticalHitEvent((Player) (Object) this, target, damageMultiplier, original);
+		event.sendEvent();
+		boolean crit = switch (event.getResult()) {
+			case ALLOW -> true;
+			case DEFAULT -> original;
+			case DENY -> false;
+		};
 
-	@ModifyVariable(method = "attack", at = @At(value = "CONSTANT", args = "floatValue=1.5F"), index = 8)
-	private boolean modifyVanillaResult(boolean value, @Share("original") LocalBooleanRef vanilla) {
-		return vanilla.get();
+		// only set the mult if it changed
+		if (event.getDamageModifier() != damageMultiplier) {
+			mult.set(event.getDamageModifier());
+		}
+
+		return crit;
 	}
 
 	@ModifyExpressionValue(method = "attack", at = @At(value = "CONSTANT", args = "floatValue=1.5F"))
-	private float getCriticalDamageMultiplier(float original, Entity target, @Share("original") LocalBooleanRef vanilla) {
-		boolean vanillaCritical = vanilla.get();
-		CriticalHitEvent hitResult = new CriticalHitEvent((Player) (Object) this, target, original, vanillaCritical);
-		hitResult.sendEvent();
-		if (hitResult.getResult() == BaseEvent.Result.ALLOW || (vanillaCritical && hitResult.getResult() == BaseEvent.Result.DEFAULT)) {
-			vanilla.set(true);
-			return hitResult.getDamageModifier();
-		}
-		return 1.0F;
+	private float modifyDamageMultiplier(float original, @Share("mult") LocalRef<Float> mult) {
+		Float newMult = mult.get();
+		return newMult == null ? original : newMult;
 	}
 
 	@Inject(method = "attack", at = @At("HEAD"), cancellable = true)
