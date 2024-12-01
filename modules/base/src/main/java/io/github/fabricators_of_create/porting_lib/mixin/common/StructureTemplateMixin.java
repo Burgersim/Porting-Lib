@@ -7,10 +7,6 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 
 import com.llamalad7.mixinextras.sugar.Local;
 
-import com.llamalad7.mixinextras.sugar.Share;
-
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-
 import io.github.fabricators_of_create.porting_lib.core.PortingLib;
 import io.github.fabricators_of_create.porting_lib.util.StructureTemplateUtils;
 import net.minecraft.util.RandomSource;
@@ -100,11 +96,6 @@ public abstract class StructureTemplateMixin implements StructureTemplateExtensi
 		return original;
 	}
 
-	@Inject(method = "placeEntities", at = @At("RETURN"))
-	private void clearGrabbedSettings(CallbackInfo ci) {
-		currentSettings.remove(); // clear the settings when done to avoid leaking it
-	}
-
 	@ModifyExpressionValue(
 			method = "placeEntities",
 			at = @At(
@@ -112,12 +103,17 @@ public abstract class StructureTemplateMixin implements StructureTemplateExtensi
 					target = "Lnet/minecraft/world/phys/Vec3;add(DDD)Lnet/minecraft/world/phys/Vec3;"
 			)
 	)
-	private Vec3 dontProcessVecTwice(Vec3 original, @Local StructureEntityInfo info, @Share("currentSettings") LocalRef<StructurePlaceSettings> currentSettings) {
+	private Vec3 dontProcessVecTwice(Vec3 original, @Local StructureEntityInfo info) {
 		StructurePlaceSettings settings = currentSettings.get();
 		if (settings != null) { // pos was already processed.
 			return info.pos;
 		}
 		return original;
+	}
+
+	@Inject(method = "placeEntities", at = @At("RETURN"))
+	private void clearGrabbedSettings(CallbackInfo ci) {
+		currentSettings.remove(); // clear the settings when done to avoid leaking it
 	}
 
 	// --- deprecated API ---
