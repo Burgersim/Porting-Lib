@@ -1,0 +1,1 @@
+- Fixed StructureTemplate entity processing

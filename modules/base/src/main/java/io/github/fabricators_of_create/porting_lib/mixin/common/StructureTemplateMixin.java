@@ -3,39 +3,37 @@ package io.github.fabricators_of_create.porting_lib.mixin.common;
 import java.util.List;
 import java.util.Objects;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-
-import com.llamalad7.mixinextras.sugar.Local;
-
-import io.github.fabricators_of_create.porting_lib.core.PortingLib;
-import io.github.fabricators_of_create.porting_lib.util.StructureTemplateUtils;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
-
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureEntityInfo;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
+
+import io.github.fabricators_of_create.porting_lib.core.PortingLib;
 import io.github.fabricators_of_create.porting_lib.extensions.extensions.StructureTemplateExtensions;
+import io.github.fabricators_of_create.porting_lib.util.StructureTemplateUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureEntityInfo;
 import net.minecraft.world.phys.Vec3;
-
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(StructureTemplate.class)
 public abstract class StructureTemplateMixin implements StructureTemplateExtensions {
+	@Unique
+	private static final ThreadLocal<StructurePlaceSettings> currentSettings = new ThreadLocal<>();
+
 	@Shadow
 	@Final
 	private List<StructureEntityInfo> entityInfoList;
@@ -43,19 +41,19 @@ public abstract class StructureTemplateMixin implements StructureTemplateExtensi
 	@Shadow
 	protected abstract void placeEntities(ServerLevelAccessor serverLevelAccessor, BlockPos blockPos, Mirror mirror, Rotation rotation, BlockPos blockPos2, @Nullable BoundingBox boundingBox, boolean bl);
 
-	@Unique
-	private static final ThreadLocal<StructurePlaceSettings> currentSettings = new ThreadLocal<>();
-
-	@Inject(
+	@WrapOperation(
 			method = "placeInWorld",
 			at = @At(
 					value = "INVOKE",
 					target = "Lnet/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplate;placeEntities(Lnet/minecraft/world/level/ServerLevelAccessor;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/Mirror;Lnet/minecraft/world/level/block/Rotation;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/levelgen/structure/BoundingBox;Z)V"
 			)
 	)
-	private void grabSettings(ServerLevelAccessor level, BlockPos pos, BlockPos pivot, StructurePlaceSettings settings,
-							  RandomSource random, int i, CallbackInfoReturnable<Boolean> cir) {
+	private void grabSettings(StructureTemplate self, ServerLevelAccessor level, BlockPos pos, Mirror mirror, Rotation rotation,
+							  BlockPos pivot, BoundingBox bounds, boolean finalize, Operation<Void> original,
+							  @Local(argsOnly = true) StructurePlaceSettings settings) {
 		currentSettings.set(settings);
+		original.call(self, level, pos, mirror, rotation, pivot, bounds, finalize);
+		currentSettings.remove();
 	}
 
 	@ModifyExpressionValue(
@@ -109,11 +107,6 @@ public abstract class StructureTemplateMixin implements StructureTemplateExtensi
 			return info.pos;
 		}
 		return original;
-	}
-
-	@Inject(method = "placeEntities", at = @At("RETURN"))
-	private void clearGrabbedSettings(CallbackInfo ci) {
-		currentSettings.remove(); // clear the settings when done to avoid leaking it
 	}
 
 	// --- deprecated API ---
