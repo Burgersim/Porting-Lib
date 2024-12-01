@@ -47,6 +47,9 @@ public abstract class StructureTemplateMixin implements StructureTemplateExtensi
 	@Shadow
 	protected abstract void placeEntities(ServerLevelAccessor serverLevelAccessor, BlockPos blockPos, Mirror mirror, Rotation rotation, BlockPos blockPos2, @Nullable BoundingBox boundingBox, boolean bl);
 
+	@Unique
+	private static final ThreadLocal<StructurePlaceSettings> currentSettings = new ThreadLocal<>();
+
 	@Inject(
 			method = "placeInWorld",
 			at = @At(
@@ -55,7 +58,7 @@ public abstract class StructureTemplateMixin implements StructureTemplateExtensi
 			)
 	)
 	private void grabSettings(ServerLevelAccessor level, BlockPos pos, BlockPos pivot, StructurePlaceSettings settings,
-							  RandomSource random, int i, CallbackInfoReturnable<Boolean> cir, @Share("currentSettings") LocalRef<StructurePlaceSettings> currentSettings) {
+							  RandomSource random, int i, CallbackInfoReturnable<Boolean> cir) {
 		currentSettings.set(settings);
 	}
 
@@ -68,7 +71,7 @@ public abstract class StructureTemplateMixin implements StructureTemplateExtensi
 	)
 	private List<StructureEntityInfo> processEntityInfos(List<StructureEntityInfo> original,
 														 ServerLevelAccessor level, BlockPos pos, Mirror mirror, Rotation rotation,
-														 BlockPos pivot, @Nullable BoundingBox bounds, boolean finalizeMobs, @Share("currentSettings") LocalRef<StructurePlaceSettings> currentSettings) {
+														 BlockPos pivot, @Nullable BoundingBox bounds, boolean finalizeMobs) {
 		StructurePlaceSettings settings = currentSettings.get();
 
 		if (PortingLib.DEBUG)
@@ -89,12 +92,17 @@ public abstract class StructureTemplateMixin implements StructureTemplateExtensi
 					target = "Lnet/minecraft/core/BlockPos;offset(Lnet/minecraft/core/Vec3i;)Lnet/minecraft/core/BlockPos;"
 			)
 	)
-	private BlockPos dontProcessBlockPosTwice(BlockPos original, @Local StructureEntityInfo info, @Share("currentSettings") LocalRef<StructurePlaceSettings> currentSettings) {
+	private BlockPos dontProcessBlockPosTwice(BlockPos original, @Local StructureEntityInfo info) {
 		StructurePlaceSettings settings = currentSettings.get();
 		if (settings != null) { // pos was already processed.
 			return info.blockPos;
 		}
 		return original;
+	}
+
+	@Inject(method = "placeEntities", at = @At("RETURN"))
+	private void clearGrabbedSettings(CallbackInfo ci) {
+		currentSettings.remove(); // clear the settings when done to avoid leaking it
 	}
 
 	@ModifyExpressionValue(
