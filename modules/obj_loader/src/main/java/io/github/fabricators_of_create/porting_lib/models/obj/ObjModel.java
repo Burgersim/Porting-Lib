@@ -9,11 +9,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 
 import io.github.fabricators_of_create.porting_lib.core.PortingLib;
 import net.fabricmc.fabric.api.renderer.v1.Renderer;
@@ -26,7 +28,6 @@ import org.joml.Vector4f;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.math.Transformation;
 
@@ -85,7 +86,7 @@ public class ObjModel implements IUnbakedGeometry<ObjModel>, UnbakedModel {
 			new Vec2(1, 0),
 	};
 
-	final Map<String, ModelGroup> parts = Maps.newLinkedHashMap();
+	final Multimap<String, ModelGroup> parts = MultimapBuilder.linkedHashKeys().arrayListValues().build();
 	private final Set<String> rootComponentNames = Collections.unmodifiableSet(parts.keySet());
 	private Set<String> allComponentNames;
 
@@ -348,7 +349,7 @@ public class ObjModel implements IUnbakedGeometry<ObjModel>, UnbakedModel {
 	}
 
 	public class ModelGroup extends ModelObject {
-		final Map<String, ModelObject> parts = Maps.newLinkedHashMap();
+		final Multimap<String, ModelObject> parts = MultimapBuilder.linkedHashKeys().arrayListValues().build();
 
 		ModelGroup(String name) {
 			super(name);
