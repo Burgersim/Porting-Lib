@@ -41,6 +41,7 @@ public interface BlockStateExtensions {
 	 * @return The resulting state after the action has been performed
 	 */
 	@Nullable
+	@Deprecated(forRemoval = true)
 	default BlockState getToolModifiedState(Level world, BlockPos pos, Player player, ItemStack stack, ToolAction toolAction) {
 		return ((BlockState) this).getBlock().getToolModifiedState(((BlockState) this), world, pos, player, stack, toolAction);
 	}
