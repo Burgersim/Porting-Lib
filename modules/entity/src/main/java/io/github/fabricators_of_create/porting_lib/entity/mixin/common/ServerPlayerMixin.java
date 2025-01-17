@@ -91,6 +91,9 @@ public abstract class ServerPlayerMixin extends Player {
 	@Shadow
 	protected abstract void createEndPlatform(ServerLevel world, BlockPos centerPos);
 
+	@Shadow
+	public abstract void setServerLevel(ServerLevel serverLevel);
+
 	@Inject(method = "<init>", at = @At("RETURN"))
 	private void port_lib$init(MinecraftServer minecraftServer, ServerLevel serverLevel, GameProfile gameProfile, CallbackInfo ci) {
 		ServerPlayerCreationCallback.EVENT.invoker().onCreate((ServerPlayer) (Object) this);
@@ -133,10 +136,10 @@ public abstract class ServerPlayerMixin extends Player {
 
 					serverlevel.getProfiler().pop();
 					serverlevel.getProfiler().push("placing");
-					this.setLevel(p_9180_);
+					this.setServerLevel(p_9180_);
+					this.connection.teleport(portalinfo.pos.x, portalinfo.pos.y, portalinfo.pos.z, portalinfo.yRot, portalinfo.xRot);
+					this.connection.resetPosition();
 					p_9180_.addDuringPortalTeleport((ServerPlayer) (Object) this);
-					this.setRot(portalinfo.yRot, portalinfo.xRot);
-					this.moveTo(portalinfo.pos.x, portalinfo.pos.y, portalinfo.pos.z);
 					serverlevel.getProfiler().pop();
 					this.triggerDimensionChangeTriggers(serverlevel);
 					return this;//forge: this is part of the ITeleporter patch
