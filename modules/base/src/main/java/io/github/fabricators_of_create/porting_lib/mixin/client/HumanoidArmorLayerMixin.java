@@ -55,13 +55,15 @@ public abstract class HumanoidArmorLayerMixin extends RenderLayer<LivingEntity, 
 	}
 
 	@WrapOperation(method = "renderArmorPiece", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/layers/HumanoidArmorLayer;renderModel(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/world/item/ArmorItem;Lnet/minecraft/client/model/HumanoidModel;ZFFFLjava/lang/String;)V"))
-	public<T extends LivingEntity, M extends HumanoidModel<T>, A extends HumanoidModel<T>> void renderModel(HumanoidArmorLayer<T, M, A> instance, PoseStack matrices, MultiBufferSource vertexConsumers, int light, ArmorItem armorItem, A model, boolean withGlint, float red, float green, float blue, @Nullable String armorSuffix, Operation<Void> original, @Local(argsOnly = true) T entity, @Local(argsOnly = true) EquipmentSlot armorSlot, @Local ItemStack itemStack) {
+	public<T extends LivingEntity, M extends HumanoidModel<T>, A extends HumanoidModel<T>> void renderModel(HumanoidArmorLayer<T, M, A> instance, PoseStack matrices, MultiBufferSource vertexConsumers, int light, ArmorItem armorItem, HumanoidModel<LivingEntity> model, boolean withGlint, float red, float green, float blue, @Nullable String armorSuffix, Operation<Void> original, @Local(argsOnly = true) T entity, @Local(argsOnly = true) EquipmentSlot armorSlot, @Local ItemStack itemStack) {
 		if(itemStack.getItem() instanceof ArmorTextureItem) {
 			ResourceLocation resourceLocation = ClientHooks.getArmorResource(entity, itemStack, armorSlot, null);
 			VertexConsumer vertexConsumer = ItemRenderer.getArmorFoilBuffer(
 					vertexConsumers, RenderType.armorCutoutNoCull(resourceLocation), false, itemStack.hasFoil()
 			);
 			model.renderToBuffer(matrices, vertexConsumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+		} else {
+			original.call(instance, matrices, vertexConsumers, light, armorItem, model, withGlint, red, green, blue, armorSuffix);
 		}
 	}
 
