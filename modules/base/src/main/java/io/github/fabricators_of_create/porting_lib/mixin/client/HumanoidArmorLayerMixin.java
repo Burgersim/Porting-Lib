@@ -1,11 +1,18 @@
 package io.github.fabricators_of_create.porting_lib.mixin.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+
+import com.llamalad7.mixinextras.sugar.Local;
+
 import io.github.fabricators_of_create.porting_lib.client.armor.ArmorRenderer;
 import io.github.fabricators_of_create.porting_lib.client.armor.ArmorRendererRegistry;
 import io.github.fabricators_of_create.porting_lib.item.ArmorTextureItem;
 
 import io.github.fabricators_of_create.porting_lib.util.ArmorTextureRegistry;
 import io.github.fabricators_of_create.porting_lib.util.client.ClientHooks;
+
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -47,16 +54,14 @@ public abstract class HumanoidArmorLayerMixin extends RenderLayer<LivingEntity, 
 		}
 	}
 
-	@Inject(method = "renderArmorPiece", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/layers/HumanoidArmorLayer;renderModel(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/world/item/ArmorItem;Lnet/minecraft/client/model/HumanoidModel;ZFFFLjava/lang/String;)V", ordinal = 2), cancellable = true)
-	public<T extends LivingEntity, A extends HumanoidModel<T>> void port_lib$fixArmorTextures(PoseStack matrices, MultiBufferSource vertexConsumers, T entity, EquipmentSlot armorSlot, int light, A model, CallbackInfo ci) {
-		ItemStack itemStack = entity.getItemBySlot(armorSlot);
+	@WrapOperation(method = "renderArmorPiece", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/layers/HumanoidArmorLayer;renderModel(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/world/item/ArmorItem;Lnet/minecraft/client/model/HumanoidModel;ZFFFLjava/lang/String;)V"))
+	public<T extends LivingEntity, M extends HumanoidModel<T>, A extends HumanoidModel<T>> void renderModel(HumanoidArmorLayer<T, M, A> instance, PoseStack matrices, MultiBufferSource vertexConsumers, int light, ArmorItem armorItem, A model, boolean withGlint, float red, float green, float blue, @Nullable String armorSuffix, Operation<Void> original, @Local(argsOnly = true) T entity, @Local(argsOnly = true) EquipmentSlot armorSlot, @Local ItemStack itemStack) {
 		if(itemStack.getItem() instanceof ArmorTextureItem) {
 			ResourceLocation resourceLocation = ClientHooks.getArmorResource(entity, itemStack, armorSlot, null);
 			VertexConsumer vertexConsumer = ItemRenderer.getArmorFoilBuffer(
 					vertexConsumers, RenderType.armorCutoutNoCull(resourceLocation), false, itemStack.hasFoil()
 			);
 			model.renderToBuffer(matrices, vertexConsumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
-			ci.cancel();
 		}
 	}
 
