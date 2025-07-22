@@ -21,16 +21,16 @@ import java.util.function.BiConsumer;
  * atlases used in vanilla Minecraft</p>
  */
 public abstract class SpriteSourceProvider extends JsonCodecProvider<List<SpriteSource>> {
-	protected static final ResourceLocation BLOCKS_ATLAS = new ResourceLocation("blocks");
-	protected static final ResourceLocation BANNER_PATTERNS_ATLAS = new ResourceLocation("banner_patterns");
-	protected static final ResourceLocation BEDS_ATLAS = new ResourceLocation("beds");
-	protected static final ResourceLocation CHESTS_ATLAS = new ResourceLocation("chests");
-	protected static final ResourceLocation SHIELD_PATTERNS_ATLAS = new ResourceLocation("shield_patterns");
-	protected static final ResourceLocation SHULKER_BOXES_ATLAS = new ResourceLocation("shulker_boxes");
-	protected static final ResourceLocation SIGNS_ATLAS = new ResourceLocation("signs");
-	protected static final ResourceLocation MOB_EFFECTS_ATLAS = new ResourceLocation("mob_effects");
-	protected static final ResourceLocation PAINTINGS_ATLAS = new ResourceLocation("paintings");
-	protected static final ResourceLocation PARTICLES_ATLAS = new ResourceLocation("particles");
+       protected static final ResourceLocation BLOCKS_ATLAS = ResourceLocation.tryParse("blocks");
+       protected static final ResourceLocation BANNER_PATTERNS_ATLAS = ResourceLocation.tryParse("banner_patterns");
+       protected static final ResourceLocation BEDS_ATLAS = ResourceLocation.tryParse("beds");
+       protected static final ResourceLocation CHESTS_ATLAS = ResourceLocation.tryParse("chests");
+       protected static final ResourceLocation SHIELD_PATTERNS_ATLAS = ResourceLocation.tryParse("shield_patterns");
+       protected static final ResourceLocation SHULKER_BOXES_ATLAS = ResourceLocation.tryParse("shulker_boxes");
+       protected static final ResourceLocation SIGNS_ATLAS = ResourceLocation.tryParse("signs");
+       protected static final ResourceLocation MOB_EFFECTS_ATLAS = ResourceLocation.tryParse("mob_effects");
+       protected static final ResourceLocation PAINTINGS_ATLAS = ResourceLocation.tryParse("paintings");
+       protected static final ResourceLocation PARTICLES_ATLAS = ResourceLocation.tryParse("particles");
 
 	private final Map<ResourceLocation, SourceList> atlases = new HashMap<>();
 

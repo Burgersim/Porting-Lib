@@ -47,9 +47,9 @@ public class ObjParser {
 		if (materialLibraryOverrideLocation != null) {
 			String lib = materialLibraryOverrideLocation;
 			if (lib.contains(":")) {
-				mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(new ResourceLocation(lib));
+                               mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(ResourceLocation.tryParse(lib));
 			} else {
-				mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(new ResourceLocation(modelDomain, modelPath + lib));
+                               mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(ResourceLocation.fromNamespaceAndPath(modelDomain, modelPath + lib));
 			}
 		}
 
@@ -63,11 +63,11 @@ public class ObjParser {
 					}
 
 					String lib = line[1];
-					if (lib.contains(":")) {
-						mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(new ResourceLocation(lib));
-					} else {
-						mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(new ResourceLocation(modelDomain, modelPath + lib));
-					}
+                                       if (lib.contains(":")) {
+                                               mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(ResourceLocation.tryParse(lib));
+                                       } else {
+                                               mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(ResourceLocation.fromNamespaceAndPath(modelDomain, modelPath + lib));
+                                       }
 					break;
 				}
 

@@ -65,7 +65,7 @@ public abstract class BlockModelDeserializerMixin {
 		if (loaderId == null)
 			return null;
 
-		ResourceLocation name = new ResourceLocation(loaderId);
+               ResourceLocation name = ResourceLocation.tryParse(loaderId);
 		IGeometryLoader<?> loader = GeometryLoaderManager.get(name);
 		if (loader == null) {
 			if (!GeometryLoaderManager.KNOWN_MISSING_LOADERS.contains(name)) {

@@ -70,10 +70,10 @@ public class ClientHooks {
 		s1 = getArmorTexture(entity, stack, s1, slot, type);
 		ResourceLocation resourcelocation = ARMOR_LOCATION_CACHE.get(s1);
 
-		if (resourcelocation == null) {
-			resourcelocation = new ResourceLocation(s1);
-			ARMOR_LOCATION_CACHE.put(s1, resourcelocation);
-		}
+               if (resourcelocation == null) {
+                       resourcelocation = ResourceLocation.tryParse(s1);
+                       ARMOR_LOCATION_CACHE.put(s1, resourcelocation);
+               }
 
 		return resourcelocation;
 	}

@@ -61,7 +61,7 @@ public class LootTableIdCondition implements LootItemCondition {
 
 		@Override
 		public LootTableIdCondition deserialize(JsonObject object, JsonDeserializationContext ctx) {
-			return new LootTableIdCondition(new ResourceLocation(GsonHelper.getAsString(object, "loot_table_id")));
+                       return new LootTableIdCondition(ResourceLocation.tryParse(GsonHelper.getAsString(object, "loot_table_id")));
 		}
 	}
 }

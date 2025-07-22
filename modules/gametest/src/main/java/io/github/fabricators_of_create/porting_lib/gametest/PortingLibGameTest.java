@@ -39,7 +39,7 @@ public class PortingLibGameTest implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		if (AREA_SELECTOR_ENABLED) {
-			Registry.register(BuiltInRegistries.ITEM, new ResourceLocation("porting_lib", "area_selector"), AREA_SELECTOR);
+                       Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath("porting_lib", "area_selector"), AREA_SELECTOR);
 			QuickExportCommand.register();
 		} else {
 			LOGGER.info("Porting Lib GameTest: Area Selector and quickexport disabled.");

@@ -52,7 +52,7 @@ public class LootModifierManager extends SimpleJsonResourceReloadListener implem
 						 @NotNull ProfilerFiller profilerIn) {
 		Builder<ResourceLocation, IGlobalLootModifier> builder = ImmutableMap.builder();
 		List<ResourceLocation> finalLocations = new ArrayList<>();
-		ResourceLocation resourcelocation = new ResourceLocation("forge","loot_modifiers/global_loot_modifiers.json");
+               ResourceLocation resourcelocation = ResourceLocation.fromNamespaceAndPath("forge","loot_modifiers/global_loot_modifiers.json");
 		//read in all data files from forge:loot_modifiers/global_loot_modifiers in order to do layering
 		for(Resource iresource : resourceManagerIn.getResourceStack(resourcelocation)) {
 			try (   InputStream inputstream = iresource.open();
@@ -64,7 +64,7 @@ public class LootModifierManager extends SimpleJsonResourceReloadListener implem
 					finalLocations.clear();
 				JsonArray entryList = jsonobject.get("entries").getAsJsonArray();
 				for(JsonElement entry : entryList) {
-					ResourceLocation loc = new ResourceLocation(entry.getAsString());
+                                       ResourceLocation loc = ResourceLocation.tryParse(entry.getAsString());
 					finalLocations.remove(loc); //remove and re-add if needed, to update the ordering.
 					finalLocations.add(loc);
 				}
