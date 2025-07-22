@@ -35,13 +35,13 @@ public class PortingLibConfig implements ModInitializer {
 	/**
 	 * The ID for the config sync packet.
 	 */
-	public static final ResourceLocation CONFIG_SYNC = new ResourceLocation(ID, "config_sync");
+       public static final ResourceLocation CONFIG_SYNC = ResourceLocation.fromNamespaceAndPath(ID, "config_sync");
 	/**
 	 * An event phase for {@link ServerPlayConnectionEvents#JOIN} that comes after config sync.
 	 * If you need to send packets to players on join that depend on config values already being synced,
 	 * register using this phase.
 	 */
-	public static final ResourceLocation AFTER_CONFIG_SYNC = new ResourceLocation(ID, "after_config_sync");
+       public static final ResourceLocation AFTER_CONFIG_SYNC = ResourceLocation.fromNamespaceAndPath(ID, "after_config_sync");
 
 	@Override
 	public void onInitialize() {

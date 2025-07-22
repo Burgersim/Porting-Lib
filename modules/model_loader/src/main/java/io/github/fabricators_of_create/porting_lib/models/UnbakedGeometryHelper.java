@@ -76,7 +76,7 @@ public class UnbakedGeometryHelper {
 			tex = namespace != null ? namespace + ":" + path : path;
 		}
 
-		return new Material(TextureAtlas.LOCATION_BLOCKS, new ResourceLocation(tex));
+               return new Material(TextureAtlas.LOCATION_BLOCKS, ResourceLocation.tryParse(tex));
 	}
 
 	/**
@@ -105,7 +105,7 @@ public class UnbakedGeometryHelper {
 	public static void bakeElements(List<BakedQuad> quads, List<BlockElement> elements, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ResourceLocation modelLocation) {
 		for (BlockElement element : elements) {
 			element.faces.forEach((side, face) -> {
-				var sprite = spriteGetter.apply(new Material(TextureAtlas.LOCATION_BLOCKS, new ResourceLocation(face.texture)));
+                               var sprite = spriteGetter.apply(new Material(TextureAtlas.LOCATION_BLOCKS, ResourceLocation.tryParse(face.texture)));
 				quads.add(BlockModel.FACE_BAKERY.bakeQuad(element.from, element.to, face, sprite, side, modelState, element.rotation, element.shade, modelLocation));
 			});
 		}

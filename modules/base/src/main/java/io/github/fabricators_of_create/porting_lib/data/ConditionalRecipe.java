@@ -111,7 +111,7 @@ public class ConditionalRecipe {
 		}
 
 		public Builder setAdvancement(String namespace, String path, ConditionalAdvancement.Builder advancement) {
-			return setAdvancement(new ResourceLocation(namespace, path), advancement);
+                       return setAdvancement(ResourceLocation.fromNamespaceAndPath(namespace, path), advancement);
 		}
 
 		public Builder setAdvancement(@Nullable ResourceLocation id, ConditionalAdvancement.Builder advancement) {
@@ -123,7 +123,7 @@ public class ConditionalRecipe {
 		}
 
 		public void build(Consumer<FinishedRecipe> consumer, String namespace, String path) {
-			build(consumer, new ResourceLocation(namespace, path));
+                       build(consumer, ResourceLocation.fromNamespaceAndPath(namespace, path));
 		}
 
 		public void build(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
@@ -133,7 +133,7 @@ public class ConditionalRecipe {
 				throw new IllegalStateException("Invalid ConditionalRecipe builder, No recipes");
 
 			if (advId == null && adv != null) {
-				advId = new ResourceLocation(id.getNamespace(), "recipes/" + id.getPath());
+                               advId = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "recipes/" + id.getPath());
 			}
 
 			consumer.accept(new Finished(id, conditions, recipes, advId, adv));

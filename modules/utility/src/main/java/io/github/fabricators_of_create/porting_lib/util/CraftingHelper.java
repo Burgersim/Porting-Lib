@@ -85,7 +85,7 @@ public class CraftingHelper {
 	public static Item getItem(String itemName, boolean disallowsAirInRecipe) {
 		Item item = tryGetItem(itemName, disallowsAirInRecipe);
 		if (item == null) {
-			if (!BuiltInRegistries.ITEM.containsKey(new ResourceLocation(itemName)))
+               if (!BuiltInRegistries.ITEM.containsKey(ResourceLocation.tryParse(itemName)))
 				throw new JsonSyntaxException("Unknown item '" + itemName + "'");
 			if (disallowsAirInRecipe && item == Items.AIR)
 				throw new JsonSyntaxException("Invalid item: " + itemName);
@@ -95,7 +95,7 @@ public class CraftingHelper {
 
 	@Nullable
 	public static Item tryGetItem(String itemName, boolean disallowsAirInRecipe) {
-		ResourceLocation itemKey = new ResourceLocation(itemName);
+               ResourceLocation itemKey = ResourceLocation.tryParse(itemName);
 		if (!BuiltInRegistries.ITEM.containsKey(itemKey))
 			return null;
 
@@ -197,7 +197,7 @@ public class CraftingHelper {
 	}
 
 	public static Predicate<JsonObject> getConditionPredicate(JsonObject json) {
-		return ResourceConditions.get(new ResourceLocation(GsonHelper.getAsString(json, ResourceConditions.CONDITION_ID_KEY)));
+               return ResourceConditions.get(ResourceLocation.tryParse(GsonHelper.getAsString(json, ResourceConditions.CONDITION_ID_KEY)));
 	}
 
 	public static boolean processConditions(JsonArray conditions) {

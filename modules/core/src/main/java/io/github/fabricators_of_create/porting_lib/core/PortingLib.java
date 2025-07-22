@@ -17,7 +17,7 @@ public class PortingLib {
 	public static final boolean DEBUG = FabricLoader.getInstance().isDevelopmentEnvironment()
 			|| Boolean.getBoolean("portingLib.debug");
 
-	public static ResourceLocation id(String path) {
-		return new ResourceLocation(ID, path);
-	}
+       public static ResourceLocation id(String path) {
+               return ResourceLocation.fromNamespaceAndPath(ID, path);
+       }
 }

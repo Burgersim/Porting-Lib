@@ -61,7 +61,7 @@ public abstract class GlobalLootModifierProvider implements DataProvider {
 		ImmutableList.Builder<CompletableFuture<?>> futuresBuilder = new ImmutableList.Builder<>();
 
 		toSerialize.forEach(LamdbaExceptionUtils.rethrowBiConsumer((name, json) -> {
-			entries.add(new ResourceLocation(modid, name));
+                       entries.add(ResourceLocation.fromNamespaceAndPath(modid, name));
 			Path modifierPath = modifierFolderPath.resolve(name + ".json");
 			futuresBuilder.add(DataProvider.saveStable(cache, json, modifierPath));
 		}));

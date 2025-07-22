@@ -65,24 +65,24 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class TierSortingRegistry {
 	private static final Logger LOGGER = LogManager.getLogger();
-	private static final ResourceLocation ITEM_TIER_ORDERING_JSON = new ResourceLocation("port_lib", "item_tier_ordering.json");
+       private static final ResourceLocation ITEM_TIER_ORDERING_JSON = ResourceLocation.fromNamespaceAndPath("port_lib", "item_tier_ordering.json");
 	private static final BiMap<ResourceLocation, Tier> tiers = HashBiMap.create();
 	private static final Multimap<ResourceLocation, ResourceLocation> edges = HashMultimap.create();
 	private static final Multimap<ResourceLocation, ResourceLocation> vanillaEdges = HashMultimap.create();
 	private static final List<Tier> sortedTiers = new ArrayList<>();
 	private static final List<Tier> sortedTiersUnmodifiable = Collections.unmodifiableList(sortedTiers);
-	private static final ResourceLocation CHANNEL_NAME = new ResourceLocation("port_lib:tier_sorting");
+       private static final ResourceLocation CHANNEL_NAME = ResourceLocation.tryParse("port_lib:tier_sorting");
 	private static final String PROTOCOL_VERSION = "1.0";
 
 	private static boolean hasCustomTiers = false;
 
 	static {
-		var wood = new ResourceLocation("wood");
-		var stone = new ResourceLocation("stone");
-		var iron = new ResourceLocation("iron");
-		var diamond = new ResourceLocation("diamond");
-		var netherite = new ResourceLocation("netherite");
-		var gold = new ResourceLocation("gold");
+               var wood = ResourceLocation.tryParse("wood");
+               var stone = ResourceLocation.tryParse("stone");
+               var iron = ResourceLocation.tryParse("iron");
+               var diamond = ResourceLocation.tryParse("diamond");
+               var netherite = ResourceLocation.tryParse("netherite");
+               var gold = ResourceLocation.tryParse("gold");
 		processTier(Tiers.WOOD, wood, List.of(), List.of());
 		processTier(Tiers.GOLD, gold, List.of(wood), List.of(stone));
 		processTier(Tiers.STONE, stone, List.of(wood), List.of(iron));
@@ -203,7 +203,7 @@ public class TierSortingRegistry {
 
 	private static ResourceLocation getTierName(Object entry) {
 		if (entry instanceof String s)
-			return new ResourceLocation(s);
+                       return ResourceLocation.tryParse(s);
 		if (entry instanceof ResourceLocation rl)
 			return rl;
 		if (entry instanceof Tier t)
@@ -249,7 +249,7 @@ public class TierSortingRegistry {
 						JsonArray order = GsonHelper.getAsJsonArray(data, "order");
 						List<Tier> customOrder = new ArrayList<>();
 						for (JsonElement entry : order) {
-							ResourceLocation id = new ResourceLocation(entry.getAsString());
+                       ResourceLocation id = ResourceLocation.tryParse(entry.getAsString());
 							Tier tier = byName(id);
 							if (tier == null) throw new IllegalStateException("Tier not found with name " + id);
 							customOrder.add(tier);

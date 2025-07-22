@@ -13,7 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 
 @Environment(EnvType.CLIENT)
 public interface OverlayRenderCallback {
-	ResourceLocation GUI_ICONS_LOCATION = new ResourceLocation("textures/gui/icons.png");
+       ResourceLocation GUI_ICONS_LOCATION = ResourceLocation.tryParse("textures/gui/icons.png");
 
 	Event<OverlayRenderCallback> EVENT = EventFactory.createArrayBacked(OverlayRenderCallback.class, callbacks -> (guiGraphics, partialTicks, window, type) -> {
 		for (OverlayRenderCallback callback : callbacks) {
